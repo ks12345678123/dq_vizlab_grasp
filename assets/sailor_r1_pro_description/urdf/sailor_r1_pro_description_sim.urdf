@@ -1,0 +1,1398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="sailor_r1_pro_description">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-0.293073 -0.0035166 0.05072"
+        rpy="0 0 0" />
+      <mass
+        value="16.374" />
+      <inertia
+        ixx="0.16106"
+        ixy="1.0437E-05"
+        ixz="-0.00046043"
+        iyy="0.2578"
+        iyz="-2.3481E-05"
+        izz="0.39605" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="-0.2575 0 -0.1"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/car_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="-0.2575 0 -0.1"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/car_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="left_wheel_link">
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/left_wheel_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/left_wheel_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="left_wheel_joint"
+    type="continuous">
+    <origin
+      xyz="0 0.2125 0"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="left_wheel_link" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="right_wheel_link">
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/right_wheel_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/right_wheel_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="right_wheel_joint"
+    type="continuous">
+    <origin
+      xyz="0 -0.2125 0"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="right_wheel_link" />
+    <axis
+      xyz="0 -1 0" />
+  </joint>
+  <link
+    name="lidar_link">
+    <inertial>
+      <origin
+        xyz="-0.00019984 5.4193E-05 0.022032"
+        rpy="0 0 0" />
+      <mass
+        value="0.14189" />
+      <inertia
+        ixx="4.1797E-05"
+        ixy="-5.3863E-09"
+        ixz="3.0577E-07"
+        iyy="4.5077E-05"
+        iyz="-3.0404E-10"
+        izz="6.8799E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/lidar_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.86275 0.86275 0.86275 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/lidar_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="lidar_joint"
+    type="fixed">
+    <origin
+      xyz="0.04471 -6.0461E-05 0.09727"
+      rpy="0 0.2618 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="lidar_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="ankle_link">
+    <inertial>
+      <origin
+        xyz="5.276E-05 -0.002107 0.1769"
+        rpy="0 0 0" />
+      <mass
+        value="5.8111" />
+      <inertia
+        ixx="0.12534"
+        ixy="2.435E-06"
+        ixz="2.6717E-05"
+        iyy="0.1345"
+        iyz="-4.198E-06"
+        izz="0.011779" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/ankle_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.97647 0.86667 0.78431 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/ankle_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ankle_joint"
+    type="revolute">
+    <origin
+      xyz="-0.329 0 0.255"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="ankle_link" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-1.57"
+      upper="1.57"
+      effort="300"
+      velocity="3.14" />
+  </joint>
+  <link
+    name="knee_link">
+    <inertial>
+      <origin
+        xyz="8.964E-06 -0.0033452 0.17117"
+        rpy="0 0 0" />
+      <mass
+        value="4.4463" />
+      <inertia
+        ixx="0.087089"
+        ixy="-2.0487E-07"
+        ixz="7.113E-07"
+        iyy="0.093965"
+        iyz="0.00011752"
+        izz="0.0086217" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/knee_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.69804 0.69804 0.69804 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/knee_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="knee_joint"
+    type="revolute">
+    <origin
+      xyz="0 0 0.375"
+      rpy="0 0 0" />
+    <parent
+      link="ankle_link" />
+    <child
+      link="knee_link" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-2.09"
+      upper="2.09"
+      effort="300"
+      velocity="3.14" />
+  </joint>
+  <link
+    name="hip_pitch_link">
+    <inertial>
+      <origin
+        xyz="1.6707E-06 -0.0079679 0.0089249"
+        rpy="0 0 0" />
+      <mass
+        value="1.5354" />
+      <inertia
+        ixx="0.0088604"
+        ixy="1.7384E-07"
+        ixz="3.5036E-08"
+        iyy="0.0099911"
+        iyz="-0.00013415"
+        izz="0.00822" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/hip_pitch_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.77647 0.75686 0.73725 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/hip_pitch_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="hip_pitch_joint"
+    type="revolute">
+    <origin
+      xyz="0 0 0.365"
+      rpy="0 0 0" />
+    <parent
+      link="knee_link" />
+    <child
+      link="hip_pitch_link" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-1.57"
+      upper="1.57"
+      effort="300"
+      velocity="3.14" />
+  </joint>
+  <link
+    name="body_link">
+    <inertial>
+      <origin
+        xyz="-0.0040234 -0.044629 0.13726"
+        rpy="0 0 0" />
+      <mass
+        value="4.8131" />
+      <inertia
+        ixx="0.039501"
+        ixy="-6.0838E-06"
+        ixz="0.00012408"
+        iyy="0.035038"
+        iyz="0.001642"
+        izz="0.019477" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/body_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.97647 0.86667 0.78431 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/body_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="hip_yaw_joint"
+    type="revolute">
+    <origin
+      xyz="0 0 0.122"
+      rpy="0 0 0" />
+    <parent
+      link="hip_pitch_link" />
+    <child
+      link="body_link" />
+    <axis
+      xyz="0 0 -1" />
+    <limit
+      lower="-3.14"
+      upper="3.14"
+      effort="300"
+      velocity="3.14" />
+  </joint>
+  <link
+    name="llink1">
+    <inertial>
+      <origin
+        xyz="-0.0023951 -1.0435E-06 0.065966"
+        rpy="0 0 0" />
+      <mass
+        value="1.4124" />
+      <inertia
+        ixx="0.0031035"
+        ixy="1.757E-07"
+        ixz="0.00011081"
+        iyy="0.0026164"
+        iyz="7.2472E-07"
+        izz="0.002434" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/llink1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/llink1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ljoint1"
+    type="revolute">
+    <origin
+      xyz="0 0.155 0.24"
+      rpy="1.5708 0 -3.1416" />
+    <parent
+      link="body_link" />
+    <child
+      link="llink1" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-3.14"
+      upper="3.14"
+      effort="300"
+      velocity="6.28" />
+  </joint>
+  <link
+    name="llink2">
+    <inertial>
+      <origin
+        xyz="0.0013936 0.096132 0.00047977"
+        rpy="0 0 0" />
+      <mass
+        value="1.6581" />
+      <inertia
+        ixx="0.005703"
+        ixy="2.6634E-05"
+        ixz="-2.7494E-05"
+        iyy="0.0027847"
+        iyz="0.0010022"
+        izz="0.0060924" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/llink2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/llink2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ljoint2"
+    type="revolute">
+    <origin
+      xyz="0 0 0.088"
+      rpy="-3.1416 1.4835 0" />
+    <parent
+      link="llink1" />
+    <child
+      link="llink2" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.1"
+      upper="3.14"
+      effort="300"
+      velocity="6.28" />
+  </joint>
+  <link
+    name="llink3">
+    <inertial>
+      <origin
+        xyz="-0.004155 0.0024908 0.12318"
+        rpy="0 0 0" />
+      <mass
+        value="1.1621" />
+      <inertia
+        ixx="0.003414"
+        ixy="4.4566E-06"
+        ixz="3.7727E-05"
+        iyy="0.0033085"
+        iyz="6.8149E-05"
+        izz="0.001692" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/llink3.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/llink3.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ljoint3"
+    type="revolute">
+    <origin
+      xyz="0 0.205 0"
+      rpy="-1.5708 -0.087266 0" />
+    <parent
+      link="llink2" />
+    <child
+      link="llink3" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-3.14"
+      upper="3.14"
+      effort="200"
+      velocity="6.28" />
+  </joint>
+  <link
+    name="llink4">
+    <inertial>
+      <origin
+        xyz="-8.6984E-07 0.097887 0.020516"
+        rpy="0 0 0" />
+      <mass
+        value="0.95974" />
+      <inertia
+        ixx="0.00259"
+        ixy="-1.4151E-08"
+        ixz="1.3262E-07"
+        iyy="0.0012326"
+        iyz="0.00049455"
+        izz="0.0027166" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/llink4.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/llink4.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ljoint4"
+    type="revolute">
+    <origin
+      xyz="0 0 0.165"
+      rpy="1.5708 0 -1.4835" />
+    <parent
+      link="llink3" />
+    <child
+      link="llink4" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-2.3"
+      upper="1.4"
+      effort="200"
+      velocity="6.28" />
+  </joint>
+  <link
+    name="llink5">
+    <inertial>
+      <origin
+        xyz="-0.00023231 0.0025197 0.06372"
+        rpy="0 0 0" />
+      <mass
+        value="0.6999" />
+      <inertia
+        ixx="0.0008436"
+        ixy="-1.0805E-05"
+        ixz="9.1795E-07"
+        iyy="0.00096816"
+        iyz="-1.0875E-05"
+        izz="0.00076471" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/llink5.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/llink5.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ljoint5"
+    type="revolute">
+    <origin
+      xyz="0 0.165 0.0015"
+      rpy="1.5708 -1.4835 3.1416" />
+    <parent
+      link="llink4" />
+    <child
+      link="llink5" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-3.14"
+      upper="3.14"
+      effort="100"
+      velocity="6.28" />
+  </joint>
+  <link
+    name="llink6">
+    <inertial>
+      <origin
+        xyz="-0.0025325 0.079865 0.01198"
+        rpy="0 0 0" />
+      <mass
+        value="0.73351" />
+      <inertia
+        ixx="0.0014957"
+        ixy="2.3427E-05"
+        ixz="-1.0666E-05"
+        iyy="0.00082057"
+        iyz="0.00023256"
+        izz="0.0013415" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/llink6.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/llink6.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ljoint6"
+    type="revolute">
+    <origin
+      xyz="0 0 0.08"
+      rpy="1.5708 0 -3.0543" />
+    <parent
+      link="llink5" />
+    <child
+      link="llink6" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.4"
+      upper="1.4"
+      effort="100"
+      velocity="6.28" />
+  </joint>
+  <link
+    name="llink7">
+    <inertial>
+      <origin
+        xyz="-2.8578E-06 0.045008 0.020641"
+        rpy="0 0 0" />
+      <mass
+        value="0.20993" />
+      <inertia
+        ixx="0.00036519"
+        ixy="-1.235E-08"
+        ixz="1.6183E-08"
+        iyy="0.0001996"
+        iyz="0.00011781"
+        izz="0.00033862" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/llink7.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/llink7.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ljoint7"
+    type="revolute">
+    <origin
+      xyz="0 0.095 0"
+      rpy="1.5743 -1.5708 -1.5744" />
+    <parent
+      link="llink6" />
+    <child
+      link="llink7" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.65"
+      upper="1.65"
+      effort="100"
+      velocity="6.28" />
+  </joint>
+  <link
+    name="lee_link">
+    <inertial>
+      <origin
+        xyz="-0.047994 -0.24132 0.024178"
+        rpy="0 0 0" />
+      <mass
+        value="0" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+  </link>
+  <joint
+    name="ljoint8"
+    type="fixed">
+    <origin
+      xyz="0 0.0825 0"
+      rpy="1.4835 0 1.5708" />
+    <parent
+      link="llink7" />
+    <child
+      link="lee_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="rlink1">
+    <inertial>
+      <origin
+        xyz="0.0023951 1.0425E-06 0.065966"
+        rpy="0 0 0" />
+      <mass
+        value="1.4124" />
+      <inertia
+        ixx="0.0031035"
+        ixy="1.7566E-07"
+        ixz="-0.00011081"
+        iyy="0.0026164"
+        iyz="-7.2481E-07"
+        izz="0.002434" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/rlink1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/rlink1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rjoint1"
+    type="revolute">
+    <origin
+      xyz="0 -0.155 0.24"
+      rpy="1.5708 0 0" />
+    <parent
+      link="body_link" />
+    <child
+      link="rlink1" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-3.14"
+      upper="3.14"
+      effort="300"
+      velocity="6.28" />
+  </joint>
+  <link
+    name="rlink2">
+    <inertial>
+      <origin
+        xyz="0.0014346 -0.096001 0.00038769"
+        rpy="0 0 0" />
+      <mass
+        value="1.6569" />
+      <inertia
+        ixx="0.0057007"
+        ixy="-0.00011401"
+        ixz="6.3477E-06"
+        iyy="0.0027845"
+        iyz="-0.00099599"
+        izz="0.0060941" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/rlink2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/rlink2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rjoint2"
+    type="revolute">
+    <origin
+      xyz="0 0 0.088"
+      rpy="0 1.5708 0" />
+    <parent
+      link="rlink1" />
+    <child
+      link="rlink2" />
+    <axis
+      xyz="0.087156 0 0.99619" />
+    <limit
+      lower="-3.14"
+      upper="0.1"
+      effort="300"
+      velocity="6.28" />
+  </joint>
+  <link
+    name="rlink3">
+    <inertial>
+      <origin
+        xyz="-0.004149 -0.0024887 0.12315"
+        rpy="0 0 0" />
+      <mass
+        value="1.1617" />
+      <inertia
+        ixx="0.0034137"
+        ixy="-4.6013E-06"
+        ixz="3.8406E-05"
+        iyy="0.0033081"
+        iyz="-6.7894E-05"
+        izz="0.0016922" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/rlink3.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/rlink3.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rjoint3"
+    type="revolute">
+    <origin
+      xyz="0 -0.205 0"
+      rpy="1.5708 0 0" />
+    <parent
+      link="rlink2" />
+    <child
+      link="rlink3" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-3.14"
+      upper="3.14"
+      effort="200"
+      velocity="6.28" />
+  </joint>
+  <link
+    name="rlink4">
+    <inertial>
+      <origin
+        xyz="8.9925E-07 -0.097887 0.020516"
+        rpy="0 0 0" />
+      <mass
+        value="0.95974" />
+      <inertia
+        ixx="0.00259"
+        ixy="-2.3973E-08"
+        ixz="-1.3344E-07"
+        iyy="0.0012326"
+        iyz="-0.00049455"
+        izz="0.0027166" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/rlink4.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/rlink4.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rjoint4"
+    type="revolute">
+    <origin
+      xyz="0 0 0.165"
+      rpy="-1.5708 0 1.4835" />
+    <parent
+      link="rlink3" />
+    <child
+      link="rlink4" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.4"
+      upper="2.3"
+      effort="200"
+      velocity="6.28" />
+  </joint>
+  <link
+    name="rlink5">
+    <inertial>
+      <origin
+        xyz="1.1818E-05 -0.0025304 0.06372"
+        rpy="0 0 0" />
+      <mass
+        value="0.6999" />
+      <inertia
+        ixx="0.00084267"
+        ixy="1.7321E-07"
+        ixz="3.304E-08"
+        iyy="0.00096909"
+        iyz="1.0913E-05"
+        izz="0.00076471" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/rlink5.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/rlink5.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rjoint5"
+    type="revolute">
+    <origin
+      xyz="0 -0.165 0.0015"
+      rpy="1.5708 -1.5708 0" />
+    <parent
+      link="rlink4" />
+    <child
+      link="rlink5" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-3.14"
+      upper="3.14"
+      effort="100"
+      velocity="6.28" />
+  </joint>
+  <link
+    name="rlink6">
+    <inertial>
+      <origin
+        xyz="0.079866 -0.0025323 0.011952"
+        rpy="0 0 0" />
+      <mass
+        value="0.73349" />
+      <inertia
+        ixx="0.00082055"
+        ixy="2.3436E-05"
+        ixz="0.00023214"
+        iyy="0.0014957"
+        iyz="-1.0126E-05"
+        izz="0.0013414" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/rlink6.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/rlink6.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rjoint6"
+    type="revolute">
+    <origin
+      xyz="0 0 0.08"
+      rpy="1.5708 -1.5708 0" />
+    <parent
+      link="rlink5" />
+    <child
+      link="rlink6" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.4"
+      upper="1.4"
+      effort="100"
+      velocity="6.28" />
+  </joint>
+  <link
+    name="rlink7">
+    <inertial>
+      <origin
+        xyz="0.045008 3.1266E-06 0.020641"
+        rpy="0 0 0" />
+      <mass
+        value="0.20993" />
+      <inertia
+        ixx="0.0001996"
+        ixy="1.342E-08"
+        ixz="0.00011781"
+        iyy="0.00036519"
+        iyz="-1.6922E-08"
+        izz="0.00033862" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/rlink7.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/rlink7.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rjoint7"
+    type="revolute">
+    <origin
+      xyz="0.095 0 0"
+      rpy="1.5708 0 0" />
+    <parent
+      link="rlink6" />
+    <child
+      link="rlink7" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.65"
+      upper="0.65"
+      effort="100"
+      velocity="6.28" />
+  </joint>
+  <link
+    name="ree_link">
+    <inertial>
+      <origin
+        xyz="-0.047994 0.24767 0.024178"
+        rpy="0 0 0" />
+      <mass
+        value="0" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+  </link>
+  <joint
+    name="rjoint8"
+    type="fixed">
+    <origin
+      xyz="0.0825000000000018 0 0"
+      rpy="-1.48352986419519 0 0" />
+    <parent
+      link="rlink7" />
+    <child
+      link="ree_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="head_yaw_link">
+    <inertial>
+      <origin
+        xyz="-4.3706E-05 0.0018202 0.041927"
+        rpy="0 0 0" />
+      <mass
+        value="0.44056" />
+      <inertia
+        ixx="0.00021888"
+        ixy="5.1017E-09"
+        ixz="-6.0235E-07"
+        iyy="0.00024342"
+        iyz="-3.5619E-07"
+        izz="0.00020621" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/head_yaw_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.89804 0.91765 0.92941 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/head_yaw_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="head_yaw_joint"
+    type="revolute">
+    <origin
+      xyz="0 0 0.347"
+      rpy="0 0 0" />
+    <parent
+      link="body_link" />
+    <child
+      link="head_yaw_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-3.0"
+      upper="3.0"
+      effort="10"
+      velocity="10" />
+  </joint>
+  <link
+    name="head_pitch_link">
+    <inertial>
+      <origin
+        xyz="0.011675 0.00017686 0.055388"
+        rpy="0 0 0" />
+      <mass
+        value="0.54402" />
+      <inertia
+        ixx="0.0017306"
+        ixy="-3.3622E-07"
+        ixz="5.231E-05"
+        iyy="0.0009066"
+        iyz="4.0543E-08"
+        izz="0.002311" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/head_pitch_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.77647 0.75686 0.73725 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://sailor_r1_pro_description/meshes/head_pitch_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="head_pitch_joint"
+    type="revolute">
+    <origin
+      xyz="0 0 0.062"
+      rpy="0 0 0" />
+    <parent
+      link="head_yaw_link" />
+    <child
+      link="head_pitch_link" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-0.524"
+      upper="0.524"
+      effort="10"
+      velocity="10" />
+  </joint>
+</robot>

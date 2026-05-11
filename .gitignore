@@ -1,0 +1,49 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Python env / package build
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# ROS2 / colcon generated dirs
+install/
+log/
+.ros/
+
+# Runtime logs / recordings
+*.log
+*.bag
+*.bag.active
+*.db3
+*.mcap
+*.sqlite3
+
+# Local config / secrets
+.env
+.env.*
+!.env.example
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Local backup snapshots
+backups/
+*.bak
+*.bak_*
+*.bak-*

@@ -1,0 +1,24 @@
+# Sailor R1 Pro 人形机器人配置（拖拽此文件夹即可加载）
+robot_name: Sailor R1 Pro
+humanoid: true
+
+# 人形各链起止 link 名称（用于从 URDF 自动提取腰/左臂/右臂/头）
+humanoid_link_names:
+  base_link: base_link
+  waist_start: base_link
+  waist_end: body_link
+  left_arm_start: body_link
+  left_arm_end: lee_link
+  right_arm_start: body_link
+  right_arm_end: ree_link
+  head_start: body_link
+  head_end: head_pitch_link
+
+# 初始关节角（腰4+左臂7+右臂7+头2=20，单位 rad）
+initial_q: [-0.3, 0.9, -0.6, 0.0, -0.5236, 0, 0, -1.0471, 0, 0, 0, 0.5236, 0, 0, 1.0471, 0, 0, 0, 0, 0]
+
+# 差速底盘参数（供前端 DQ DifferentialDriveRobot 读取）
+mobile_base:
+  wheel_radius: 0.10
+  distance_between_wheels: 0.425
+  initial_q: [0, 0, 0]  # [x, y, yaw]
