@@ -2,19 +2,16 @@
 from __future__ import annotations
 
 import argparse
+import math
 import os
 from pathlib import Path
 import sys
 import time
 from typing import Sequence
 
-from builtin_interfaces.msg import Duration
 import rclpy
 from rclpy.node import Node
-from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from sensor_msgs.msg import JointState
-from std_msgs.msg import Bool
-from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 
 DQ_VIZLAB_ROOT = Path(os.environ.get("DQ_VIZLAB_ROOT", "/home/syx/dq_vizlab/dq_vizlab")).expanduser()
@@ -23,11 +20,11 @@ if SDK_PYTHON.exists():
     sys.path.insert(0, str(SDK_PYTHON))
 
 from sailor_sdk import (  # noqa: E402
-    AbsolutePoseTOPPRAPlanner,
     DEFAULT_INITIAL_Q,
     HUMANOID_JOINT_NAMES,
     NullspaceSolverClient,
     dq_pose_to_quaternion_translation,
+    interpolate_absolute_pose_waypoints,
     pose_dq_from_quaternion_translation,
 )
 
@@ -48,16 +45,6 @@ def _topic_prefix(namespace: str) -> str:
     return f"/{ns}" if ns else ""
 
 
-def _duration_from_seconds(seconds: float) -> Duration:
-    seconds = max(0.0, float(seconds))
-    whole = int(seconds)
-    nanos = int(round((seconds - whole) * 1_000_000_000))
-    if nanos >= 1_000_000_000:
-        whole += 1
-        nanos -= 1_000_000_000
-    return Duration(sec=whole, nanosec=nanos)
-
-
 def _parse_dq(text: str) -> list[float]:
     values = [float(item.strip()) for item in text.split(",") if item.strip()]
     if len(values) != 8:
@@ -72,33 +59,36 @@ def _require_all_or_none(values: Sequence[float | None], label: str) -> bool:
     return all(present)
 
 
-class DQAbsolutePlanDemo(Node):
+def _quaternion_distance(a: Sequence[float], b: Sequence[float]) -> float:
+    dot = sum(float(a[index]) * float(b[index]) for index in range(4))
+    dot = max(-1.0, min(1.0, abs(dot)))
+    return 2.0 * math.acos(dot)
+
+
+def _pose_error(target_pose: Sequence[float], actual_pose: Sequence[float]) -> tuple[float, float]:
+    target_quat, target_xyz = dq_pose_to_quaternion_translation(target_pose)
+    actual_quat, actual_xyz = dq_pose_to_quaternion_translation(actual_pose)
+    translation_error = math.sqrt(sum((target_xyz[i] - actual_xyz[i]) ** 2 for i in range(3)))
+    rotation_error = _quaternion_distance(target_quat, actual_quat)
+    return translation_error, rotation_error
+
+
+class DQAbsoluteTrackDemo(Node):
     def __init__(self, *, namespace: str) -> None:
-        super().__init__("qpin_dq_absolute_plan_demo")
+        super().__init__("qpin_dq_absolute_track_demo")
         prefix = _topic_prefix(namespace)
         self.joint_state_topic = f"{prefix}/joint_states"
-        self.trajectory_topic = f"{prefix}/joint_trajectory"
-        self.visual_ready_topic = f"{prefix}/visual_ready"
+        self.joint_command_topic = f"{prefix}/joint_command"
         self.current_q = [float(value) for value in DEFAULT_INITIAL_Q]
         self.has_joint_state = False
-        self.has_visual_ready = False
         self.joint_index = {name: index for index, name in enumerate(HUMANOID_JOINT_NAMES)}
-        ready_qos = QoSProfile(depth=1)
-        ready_qos.reliability = ReliabilityPolicy.RELIABLE
-        ready_qos.durability = DurabilityPolicy.TRANSIENT_LOCAL
         self.joint_state_sub = self.create_subscription(
             JointState,
             self.joint_state_topic,
             self._on_joint_state,
             10,
         )
-        self.visual_ready_sub = self.create_subscription(
-            Bool,
-            self.visual_ready_topic,
-            self._on_visual_ready,
-            ready_qos,
-        )
-        self.trajectory_pub = self.create_publisher(JointTrajectory, self.trajectory_topic, 10)
+        self.joint_command_pub = self.create_publisher(JointState, self.joint_command_topic, 10)
 
     def _on_joint_state(self, msg: JointState) -> None:
         names = list(msg.name or [])
@@ -113,9 +103,6 @@ class DQAbsolutePlanDemo(Node):
         if recognized:
             self.has_joint_state = True
 
-    def _on_visual_ready(self, msg: Bool) -> None:
-        self.has_visual_ready = bool(msg.data)
-
     def wait_for_joint_state(self, *, timeout_sec: float, require: bool) -> tuple[list[float], str]:
         deadline = time.monotonic() + max(0.0, float(timeout_sec))
         while rclpy.ok() and time.monotonic() < deadline:
@@ -126,38 +113,17 @@ class DQAbsolutePlanDemo(Node):
             raise TimeoutError(f"no JointState received on {self.joint_state_topic} within {timeout_sec:.2f}s")
         return self.current_q[:], "DEFAULT_INITIAL_Q"
 
-    def wait_for_trajectory_subscriber(self, *, timeout_sec: float) -> bool:
-        deadline = time.monotonic() + max(0.0, float(timeout_sec))
-        while rclpy.ok() and time.monotonic() < deadline:
-            if self.trajectory_pub.get_subscription_count() > 0:
-                return True
-            rclpy.spin_once(self, timeout_sec=min(0.1, max(0.0, deadline - time.monotonic())))
-        return self.trajectory_pub.get_subscription_count() > 0
-
-    def wait_for_visual_ready(self, *, timeout_sec: float) -> bool:
-        deadline = time.monotonic() + max(0.0, float(timeout_sec))
-        while rclpy.ok() and time.monotonic() < deadline:
-            if self.has_visual_ready:
-                return True
-            rclpy.spin_once(self, timeout_sec=min(0.1, max(0.0, deadline - time.monotonic())))
-        return self.has_visual_ready
-
-    def publish_trajectory(self, trajectory) -> None:
-        msg = JointTrajectory()
+    def publish_joint_command(self, q: Sequence[float]) -> None:
+        msg = JointState()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.joint_names = list(HUMANOID_JOINT_NAMES)
+        msg.name = list(HUMANOID_JOINT_NAMES)
+        msg.position = [float(value) for value in q]
+        self.joint_command_pub.publish(msg)
 
-        for index, sample_time in enumerate(trajectory.sample_times):
-            point = JointTrajectoryPoint()
-            point.positions = [float(value) for value in trajectory.positions[index]]
-            if index < len(trajectory.velocities):
-                point.velocities = [float(value) for value in trajectory.velocities[index]]
-            if index < len(trajectory.accelerations):
-                point.accelerations = [float(value) for value in trajectory.accelerations[index]]
-            point.time_from_start = _duration_from_seconds(sample_time)
-            msg.points.append(point)
-
-        self.trajectory_pub.publish(msg)
+    def wait_seconds(self, seconds: float) -> None:
+        deadline = time.monotonic() + max(0.0, float(seconds))
+        while rclpy.ok() and time.monotonic() < deadline:
+            rclpy.spin_once(self, timeout_sec=min(0.05, max(0.0, deadline - time.monotonic())))
 
 
 def _build_target_pose(args: argparse.Namespace, start_pose: Sequence[float]) -> tuple[list[float], list[float], list[float]]:
@@ -199,19 +165,16 @@ def _build_target_pose(args: argparse.Namespace, start_pose: Sequence[float]) ->
 
 def _build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Plan a dq_vizlab absolute-pose trajectory and publish it to qpin_sim_env."
+        description="Generate an absolute-pose trajectory and track it online with dq_vizlab in qpin_sim_env."
     )
     parser.add_argument("--namespace", default="qpin_sim")
     parser.add_argument("--solver-binary", default=str(DEFAULT_SOLVER_BINARY))
     parser.add_argument("--urdf-path", default=str(DEFAULT_SOLVER_URDF))
     parser.add_argument("--joint-state-timeout", type=float, default=2.0)
     parser.add_argument("--require-joint-state", action="store_true")
-    parser.add_argument("--publisher-match-timeout", type=float, default=2.0)
-    parser.add_argument("--visual-ready-timeout", type=float, default=15.0)
-    parser.add_argument("--waypoint-count", type=int, default=8)
-    parser.add_argument("--sample-count", type=int, default=120)
-    parser.add_argument("--max-vel", type=float, default=0.45)
-    parser.add_argument("--max-acc", type=float, default=0.90)
+    parser.add_argument("--sample-count", type=int, default=30)
+    parser.add_argument("--step-dt", type=float, default=0.1)
+    parser.add_argument("--settle-time", type=float, default=0.05)
     parser.add_argument("--include-waist", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--keep-body-z-vertical", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--joint-limit-avoidance", action=argparse.BooleanOptionalAction, default=True)
@@ -219,7 +182,7 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 
     parser.add_argument("--dx", type=float, default=0.0)
     parser.add_argument("--dy", type=float, default=0.0)
-    parser.add_argument("--dz", type=float, default=-0.12)
+    parser.add_argument("--dz", type=float, default=-0.03)
 
     parser.add_argument("--target-x", type=float)
     parser.add_argument("--target-y", type=float)
@@ -236,68 +199,91 @@ def main() -> None:
     args = _build_arg_parser().parse_args()
 
     rclpy.init()
-    node = DQAbsolutePlanDemo(namespace=args.namespace)
+    node = DQAbsoluteTrackDemo(namespace=args.namespace)
     try:
-        visual_ready = node.wait_for_visual_ready(timeout_sec=args.visual_ready_timeout)
-        print(
-            f"visual ready: {visual_ready} on {node.visual_ready_topic}",
-            flush=True,
-        )
         q_start, q_source = node.wait_for_joint_state(
             timeout_sec=args.joint_state_timeout,
             require=args.require_joint_state,
         )
 
-        solver = NullspaceSolverClient(
+        with NullspaceSolverClient(
             solver_binary=args.solver_binary,
             urdf_path=args.urdf_path,
-        )
-        planner = AbsolutePoseTOPPRAPlanner()
-        start_state = solver.get_state(q_start)
-        target_pose, start_translation, target_translation = _build_target_pose(args, start_state.absolute_pose)
+        ) as solver:
+            start_state = solver.get_state(q_start)
+            target_pose, start_translation, target_translation = _build_target_pose(args, start_state.absolute_pose)
+            pose_samples = interpolate_absolute_pose_waypoints(
+                start_state.absolute_pose,
+                target_pose,
+                max(2, int(args.sample_count)),
+            )
 
-        print(f"q source: {q_source}", flush=True)
-        print(f"start absolute xyz: {[round(value, 6) for value in start_translation]}", flush=True)
-        print(f"target absolute xyz: {[round(value, 6) for value in target_translation]}", flush=True)
-        print(
-            "planning: "
-            f"waypoints={args.waypoint_count}, samples={args.sample_count}, "
-            f"include_waist={args.include_waist}, keep_body_z_vertical={args.keep_body_z_vertical}",
-            flush=True,
-        )
+            print(f"q source: {q_source}", flush=True)
+            print(f"start absolute xyz: {[round(value, 6) for value in start_translation]}", flush=True)
+            print(f"target absolute xyz: {[round(value, 6) for value in target_translation]}", flush=True)
+            print(
+                "tracking: "
+                f"samples={len(pose_samples)}, step_dt={args.step_dt}, "
+                f"include_waist={args.include_waist}, keep_body_z_vertical={args.keep_body_z_vertical}",
+                flush=True,
+            )
 
-        t0 = time.perf_counter()
-        plan = planner.plan_absolute_pose(
-            solver,
-            q_start=q_start,
-            target_pose=target_pose,
-            include_waist=args.include_waist,
-            keep_body_z_vertical=args.keep_body_z_vertical,
-            joint_limit_avoidance=args.joint_limit_avoidance,
-            waypoint_count=args.waypoint_count,
-            max_vel=args.max_vel,
-            max_acc=args.max_acc,
-            sample_count=args.sample_count,
-        )
-        planning_seconds = time.perf_counter() - t0
+            if args.dry_run:
+                print("dry run: trajectory generated but not tracked", flush=True)
+                return
 
-        print(f"planning wall time: {planning_seconds:.3f}s", flush=True)
-        print(f"trajectory duration: {plan.trajectory.duration:.3f}s", flush=True)
-        print(f"joint waypoints: {len(plan.joint_waypoints)}", flush=True)
-        print(f"trajectory samples: {len(plan.trajectory.sample_times)}", flush=True)
-        if plan.solve_results:
-            print(f"final solve reason: {plan.solve_results[-1].reason}", flush=True)
+            solve_times: list[float] = []
+            translation_errors: list[float] = []
+            rotation_errors: list[float] = []
+            retry_count = 0
+            q_command = q_start[:]
+            start_time = time.monotonic()
 
-        if args.dry_run:
-            print("dry run: trajectory was not published", flush=True)
-            return
+            for index, target_sample in enumerate(pose_samples):
+                sample_deadline = start_time + index * float(args.step_dt)
+                while rclpy.ok() and time.monotonic() < sample_deadline:
+                    rclpy.spin_once(node, timeout_sec=min(0.02, sample_deadline - time.monotonic()))
 
-        has_subscriber = node.wait_for_trajectory_subscriber(timeout_sec=args.publisher_match_timeout)
-        if not has_subscriber:
-            print(f"warning: no subscriber matched on {node.trajectory_topic}; publishing once anyway", flush=True)
-        node.publish_trajectory(plan.trajectory)
-        print(f"published JointTrajectory to {node.trajectory_topic}", flush=True)
-        rclpy.spin_once(node, timeout_sec=0.2)
+                t0 = time.perf_counter()
+                q_feedback = node.current_q[:]
+                result = solver.solve_absolute(
+                    q=q_feedback,
+                    target_pose=target_sample,
+                    include_waist=args.include_waist,
+                    keep_body_z_vertical=args.keep_body_z_vertical,
+                    joint_limit_avoidance=args.joint_limit_avoidance,
+                )
+                if not result.apply_result:
+                    result = solver.solve_absolute(
+                        q=q_command,
+                        target_pose=target_sample,
+                        include_waist=args.include_waist,
+                        keep_body_z_vertical=args.keep_body_z_vertical,
+                        joint_limit_avoidance=args.joint_limit_avoidance,
+                    )
+                    retry_count += 1
+                solve_times.append(time.perf_counter() - t0)
+                if not result.apply_result:
+                    raise RuntimeError(f"tracking solve failed at sample {index}: {result.reason}")
+
+                q_command = result.q[:]
+                node.publish_joint_command(result.q)
+                node.wait_seconds(args.settle_time)
+                actual_state = solver.get_state(node.current_q)
+                translation_error, rotation_error = _pose_error(target_sample, actual_state.absolute_pose)
+                translation_errors.append(translation_error)
+                rotation_errors.append(rotation_error)
+
+            final_state = solver.get_state(node.current_q)
+            final_translation_error, final_rotation_error = _pose_error(target_pose, final_state.absolute_pose)
+
+            print(f"mean solve time: {1000.0 * sum(solve_times) / len(solve_times):.3f} ms", flush=True)
+            print(f"max solve time: {1000.0 * max(solve_times):.3f} ms", flush=True)
+            print(f"retry count: {retry_count}", flush=True)
+            print(f"mean translation error: {1000.0 * sum(translation_errors) / len(translation_errors):.3f} mm", flush=True)
+            print(f"max translation error: {1000.0 * max(translation_errors):.3f} mm", flush=True)
+            print(f"final translation error: {1000.0 * final_translation_error:.3f} mm", flush=True)
+            print(f"final rotation error: {math.degrees(final_rotation_error):.3f} deg", flush=True)
     finally:
         node.destroy_node()
         if rclpy.ok():

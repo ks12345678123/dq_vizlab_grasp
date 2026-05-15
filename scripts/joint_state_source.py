@@ -63,6 +63,8 @@ DEFAULT_POSITIONS = {
     "head_pitch_joint": 0.0,
 }
 
+ZERO_POSITIONS = {name: 0.0 for name in JOINT_ORDER}
+
 
 @dataclass
 class ActiveTrajectory:
@@ -77,13 +79,22 @@ def _duration_to_seconds(duration) -> float:
     return float(duration.sec) + 1e-9 * float(duration.nanosec)
 
 
+def _parse_bool(text: str) -> bool:
+    value = str(text).strip().lower()
+    if value in {"1", "true", "yes", "on"}:
+        return True
+    if value in {"0", "false", "no", "off"}:
+        return False
+    raise argparse.ArgumentTypeError(f"invalid boolean value: {text}")
+
+
 class JointStateSource(Node):
-    def __init__(self, *, namespace: str, rate_hz: float) -> None:
+    def __init__(self, *, namespace: str, rate_hz: float, zero_initial_pose: bool) -> None:
         super().__init__("qpin_sim_joint_state_source")
         ns = namespace.strip("/")
         self.topic_prefix = f"/{ns}" if ns else ""
         self.period = 1.0 / max(1.0, float(rate_hz))
-        self.positions = dict(DEFAULT_POSITIONS)
+        self.positions = dict(ZERO_POSITIONS if zero_initial_pose else DEFAULT_POSITIONS)
         self.active_trajectory: ActiveTrajectory | None = None
 
         self.joint_pub = self.create_publisher(JointState, f"{self.topic_prefix}/joint_states", 10)
@@ -104,7 +115,8 @@ class JointStateSource(Node):
         self.timer = self.create_timer(self.period, self._publish)
         self.get_logger().info(
             f"publishing JointState on {self.topic_prefix}/joint_states; "
-            f"commands: {self.topic_prefix}/joint_command and {self.topic_prefix}/joint_trajectory"
+            f"commands: {self.topic_prefix}/joint_command and {self.topic_prefix}/joint_trajectory; "
+            f"zero_initial_pose={zero_initial_pose}"
         )
 
     def _on_joint_command(self, msg: JointState) -> None:
@@ -193,10 +205,15 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--namespace", default="qpin_sim")
     parser.add_argument("--rate-hz", type=float, default=30.0)
+    parser.add_argument("--zero-initial-pose", type=_parse_bool, default=False)
     args, ros_args = parser.parse_known_args()
 
     rclpy.init(args=ros_args)
-    node = JointStateSource(namespace=args.namespace, rate_hz=args.rate_hz)
+    node = JointStateSource(
+        namespace=args.namespace,
+        rate_hz=args.rate_hz,
+        zero_initial_pose=args.zero_initial_pose,
+    )
     try:
         rclpy.spin(node)
     finally:

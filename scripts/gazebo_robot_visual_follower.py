@@ -17,7 +17,9 @@ import numpy as np
 import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
+from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from scipy.spatial.transform import Rotation
+from std_msgs.msg import Bool
 from tf2_ros import Buffer
 from tf2_ros import TransformException
 from tf2_ros import TransformListener
@@ -314,7 +316,15 @@ def _pose_from_matrix(matrix: np.ndarray) -> Pose:
 
 
 class GazeboRobotVisualFollower(Node):
-    def __init__(self, *, visual_links: list[VisualLink], root_frame: str, world_pose_topic: str, rate_hz: float) -> None:
+    def __init__(
+        self,
+        *,
+        visual_links: list[VisualLink],
+        root_frame: str,
+        world_pose_topic: str,
+        ready_topic: str,
+        rate_hz: float,
+    ) -> None:
         super().__init__("qpin_gazebo_robot_visual_follower")
         self.visual_links = visual_links
         self.root_frame = str(root_frame)
@@ -323,10 +333,15 @@ class GazeboRobotVisualFollower(Node):
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
         self.world_pose_topic = str(world_pose_topic)
+        self.ready_topic = str(ready_topic)
         self.world_from_root = np.eye(4, dtype=float)
         self.period = 1.0 / max(1.0, rate_hz)
         self.timer = None
         self.last_warn_time = 0.0
+        ready_qos = QoSProfile(depth=1)
+        ready_qos.reliability = ReliabilityPolicy.RELIABLE
+        ready_qos.durability = DurabilityPolicy.TRANSIENT_LOCAL
+        self.ready_pub = self.create_publisher(Bool, self.ready_topic, ready_qos)
         self.world_pose_sub = self.create_subscription(
             PoseStamped,
             self.world_pose_topic,
@@ -397,6 +412,7 @@ class GazeboRobotVisualFollower(Node):
             if response is not None and not response.success and "already exists" not in response.status_message:
                 self.get_logger().warn(f"spawn failed for {visual_link.model_name}: {response.status_message}")
         self.get_logger().info("Gazebo visual models are spawned and following TF")
+        self.ready_pub.publish(Bool(data=True))
         self.timer = self.create_timer(self.period, self._publish_link_states)
 
     def _publish_link_states(self) -> None:
@@ -433,6 +449,7 @@ def main() -> None:
     )
     parser.add_argument("--root-frame", default="base_link")
     parser.add_argument("--world-pose-topic", default="/qpin_sim/world_from_base")
+    parser.add_argument("--ready-topic", default="/qpin_sim/visual_ready")
     parser.add_argument("--rate-hz", type=float, default=15.0)
     args, ros_args = parser.parse_known_args()
 
@@ -451,6 +468,7 @@ def main() -> None:
         visual_links=visual_links,
         root_frame=args.root_frame,
         world_pose_topic=args.world_pose_topic,
+        ready_topic=args.ready_topic,
         rate_hz=args.rate_hz,
     )
     try:

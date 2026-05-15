@@ -39,12 +39,14 @@ def generate_launch_description():
 
     namespace = LaunchConfiguration("namespace")
     rate_hz = LaunchConfiguration("rate_hz")
+    zero_initial_pose = LaunchConfiguration("zero_initial_pose")
 
     return LaunchDescription(
         [
             DeclareLaunchArgument("namespace", default_value="qpin_sim"),
             DeclareLaunchArgument("rate_hz", default_value="30.0"),
             DeclareLaunchArgument("rviz", default_value="true"),
+            DeclareLaunchArgument("zero_initial_pose", default_value="false"),
             Node(
                 package="robot_state_publisher",
                 executable="robot_state_publisher",
@@ -67,6 +69,8 @@ def generate_launch_description():
                     namespace,
                     "--rate-hz",
                     rate_hz,
+                    "--zero-initial-pose",
+                    zero_initial_pose,
                 ],
                 output="screen",
             ),

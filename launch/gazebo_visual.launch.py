@@ -43,6 +43,7 @@ def generate_launch_description():
 
     namespace = LaunchConfiguration("namespace")
     rate_hz = LaunchConfiguration("rate_hz")
+    zero_initial_pose = LaunchConfiguration("zero_initial_pose")
     gazebo_launch = PythonLaunchDescriptionSource([FindPackageShare("gazebo_ros"), "/launch/gazebo.launch.py"])
 
     return LaunchDescription(
@@ -52,6 +53,7 @@ def generate_launch_description():
             DeclareLaunchArgument("gui", default_value="true"),
             DeclareLaunchArgument("rviz", default_value="true"),
             DeclareLaunchArgument("visual_follower", default_value="true"),
+            DeclareLaunchArgument("zero_initial_pose", default_value="false"),
             IncludeLaunchDescription(
                 gazebo_launch,
                 launch_arguments={
@@ -82,6 +84,8 @@ def generate_launch_description():
                     namespace,
                     "--rate-hz",
                     rate_hz,
+                    "--zero-initial-pose",
+                    zero_initial_pose,
                 ],
                 output="screen",
             ),
@@ -95,6 +99,8 @@ def generate_launch_description():
                     "base_link",
                     "--world-pose-topic",
                     "/qpin_sim/world_from_base",
+                    "--ready-topic",
+                    "/qpin_sim/visual_ready",
                     "--exclude-link",
                     "gazebo_camera_link",
                     "--rate-hz",
